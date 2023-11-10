@@ -1,0 +1,78 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOi7wIXpix6jNf3wgsYBIdK",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "ir",
+      "display_name": "R"
+    },
+    "language_info": {
+      "name": "R"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Omerizdn/Churn/blob/main/Data%20Cleaning\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "# Read the CSV file\n",
+        "Customer_Churn <- read.csv(\"/content/Churn dataset.csv\", stringsAsFactors = TRUE, sep = \",\", na.strings = c(\"\", \"NA\"))\n",
+        "\n",
+        "# Remove unnecessary columns\n",
+        "Customer_Churn <- Customer_Churn %>%\n",
+        "  select(-term_reas_code, -term_reas_desc, -X)\n",
+        "\n",
+        "# Remove rows with missing values\n",
+        "Clean_Customer_Churn <- na.omit(Customer_Churn)\n",
+        "\n",
+        "# Categorize contract months variable every 12 months\n",
+        "Clean_Customer_Churn <- Clean_Customer_Churn %>%\n",
+        "  mutate(Contract_Month_Cat = cut(contract_month,\n",
+        "                                 breaks = c(-Inf, 12, 24, 36, 48, 60, Inf),\n",
+        "                                 labels = c('0 - 12 Month', '12 - 24 Month', '24 - 36 Month',\n",
+        "                                            '36 - 48 Month', '48 - 60 Month', '60 - 120 Month'),\n",
+        "                                 include.lowest = TRUE),\n",
+        "         Contract_Month_Cat = as.factor(Contract_Month_Cat))\n",
+        "\n",
+        "# Categorize tenure months variable every 72 months\n",
+        "Clean_Customer_Churn <- Clean_Customer_Churn %>%\n",
+        "  mutate(tenure_Cat = cut(tenure,\n",
+        "                          breaks = c(-Inf, 72, 144, Inf),\n",
+        "                          labels = c('0 - 72 Month', '72 - 144 Month', '>144 Month'),\n",
+        "                          include.lowest = TRUE),\n",
+        "         tenure_Cat = as.factor(tenure_Cat))\n",
+        "\n",
+        "# Remove unnecessary columns\n",
+        "Clean_Customer_Churn <- Clean_Customer_Churn %>%\n",
+        "  select(-contract_month, -tenure, -serv_type, -bill_cycl)\n",
+        "\n",
+        "\n",
+        "# Save Clean Data\n",
+        "write.table(Clean_Customer_Churn, \"/content/Churn_Clean.csv\", sep = \",\", quote = FALSE, row.names = FALSE)\n",
+        "\n",
+        "# Validation: Read Clean Data\n",
+        "Clean_Customer_Churn <- read.csv(\"/content/Churn_Clean.csv\", stringsAsFactors = TRUE, sep = \",\", na.strings = c(\"\", \"NA\"))\n"
+      ],
+      "metadata": {
+        "id": "Hi56RLNT9m11"
+      },
+      "execution_count": 13,
+      "outputs": []
+    }
+  ]
+}
